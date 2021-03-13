@@ -3,35 +3,38 @@
  * GitHub: https://github.com/irgendwr/sinusbot-scripts
  */
 
+/** Requests:
+* Move on Mic disabled
+* + move back on unmute/enable/undeafen
+* Config msgs per move
+*BUG: Idle time <2 min seems to be broken
+*
+*/
+
 registerPlugin({
     name: 'AFK mover (Away/Mute/Deaf/Idle)',
-    version: '2.4.0',
-    description: 'Moves clients that are set as away, have their speakers/mic muted or are idle to a specified channel',
-    author: 'Jonas Bögle <jonas@boegle.de>',
+    version: '2.4.1',
+    description: 'A fork of the original by Jonas Bögle (irgendwr) with better notifications. Moves clients that are set as away, have their speakers/mic muted or are idle to a specified channel',
+    author: 'Arjan Dob (arriej)',
     vars: [
         /*** general ***/
         {
             name: 'afkChannel',
-            title: 'AFK Channel',
+            title: 'Select your AFK Channel',
             type: 'channel'
         },
 
         /*** away ***/
+        /***Enable Away move option ***/
         {
             name: 'awayEnabled',
-            title: '[AWAY] Move users who set themselves as away',
+            title: 'Away - Move users who set themselves as away',
             type: 'checkbox'
         },
-        {
-            name: 'awayMoveBack',
-            title: 'Move users back',
-            type: 'checkbox',
-            indent: 3,
-            conditions: [{ field: 'awayEnabled', value: true }]
-        },
+        /*** Inore servergroups on away ***/
         {
             name: 'awaySgBlacklist',
-            title: 'Ignore users with these servergroups:',
+            title: 'Ignore users with these server group(s):',
             type: 'array',
             vars: [{
                 name: 'servergroup',
@@ -41,6 +44,7 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'awayEnabled', value: true }]
         },
+        /*** Apllies to what channel?  ***/
         {
             name: 'awayChannelIgnoreType',
             title: 'Should this only apply to certain channels?',
@@ -53,6 +57,7 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'awayEnabled', value: true }]
         },
+        /*** Ignore selected channels ***/
         {
             name: 'awayChannelList',
             title: 'Channels:',
@@ -65,6 +70,7 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'awayEnabled', value: true }]
         },
+        /*** Move Delay  ***/
         {
             name: 'awayDelay',
             title: 'Delay (in seconds)',
@@ -72,13 +78,49 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'awayEnabled', value: true }]
         },
-
+        /*** Move back when back ***/
+        {
+            name: 'awayMoveBack',
+            title: 'Move users back',
+            type: 'checkbox',
+            indent: 3,
+            conditions: [{ field: 'awayEnabled', value: true }]
+        },
+        /*** Away notifications ***/
+        /*** Enable notifications for away section ***/
+        {
+            name: 'awaynotify',
+            title: 'Enable Away notifications',
+            type: 'checkbox',
+            indent: 3,
+            conditions: [{ field: 'awayEnabled', value: true }]
+        },
+        /*** How should a client be notified ***/
+        {
+            name: 'awaynotifyType',
+            title: 'How should client be notified?',
+            type: 'select',
+            options: [ 'disabled' 'chat', 'poke' ],
+            indent: 4,
+            conditions: [{ field: 'awaynotify', value: true }]
+        },
+        /*** Notification msgs ***/
+        {
+            name: 'awaynotifyText',
+            title: 'Notification message',
+            type: 'string',
+            placeholder: 'You were moved to the afk channel because you are away.',
+            indent: 4,
+            conditions: [{ field: 'awaynotify', value: true }]
+        },
         /*** mute ***/
+        /*** Enable move on mute ***/
         {
             name: 'muteEnabled',
-            title: '[MUTE] Move users who mute themselves',
+            title: 'Mute - Move muted clients',
             type: 'checkbox'
         },
+        /*** move back on unmute ***/
         {
             name: 'muteMoveBack',
             title: 'Move users back',
@@ -129,11 +171,37 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'muteEnabled', value: true }]
         },
-
+        /*** Mute notifications ***/
+        /*** Enable notifications for Mute section ***/
+        {
+            name: 'mutenotify',
+            title: 'Enable mute notifications',
+            type: 'checkbox',
+            indent: 3,
+            conditions: [{ field: 'muteEnabled', value: true }]
+        },
+        /*** How should a client be notified ***/
+        {
+            name: 'mutenotifyType',
+            title: 'How should client be notified?',
+            type: 'select',
+            options: [ 'chat', 'poke' ],
+            indent: 4,
+            conditions: [{ field: 'mutenotify', value: true }]
+        },
+        /*** Notification msgs ***/
+        {
+            name: 'mutenotifyText',
+            title: 'Notification message',
+            type: 'string',
+            placeholder: 'You were moved to the afk channel because you muted your self.',
+            indent: 4,
+            conditions: [{ field: 'mutenotify', value: true }]
+        },
         /*** deaf ***/
         {
             name: 'deafEnabled',
-            title: '[DEAF] Move users who deactivate their speaker',
+            title: 'Deafen - Move users who deactivate their speaker',
             type: 'checkbox'
         },
         {
@@ -186,11 +254,38 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'deafEnabled', value: true }]
         },
+        /*** Deafen notifications ***/
+        /*** Enable notifications for Deafen section ***/
+        {
+            name: 'deafnotify',
+            title: 'Enable deafen notifications',
+            type: 'checkbox',
+            indent: 3,
+            conditions: [{ field: 'deafEnabled', value: true }]
+        },
+        /*** How should a client be notified ***/
+        {
+            name: 'deafnotifyType',
+            title: 'How should client be notified?',
+            type: 'select',
+            options: [ 'chat', 'poke' ],
+            indent: 4,
+            conditions: [{ field: 'deafnotify', value: true }]
+        },
+        /*** Notification msgs ***/
+        {
+            name: 'deafnotifyText',
+            title: 'Notification message',
+            type: 'string',
+            placeholder: 'You were moved to the afk channel, reason: %reason%',
+            indent: 4,
+            conditions: [{ field: 'deafnotify', value: true }]
+        },
 
         /*** idle ***/
         {
             name: 'idleEnabled',
-            title: '[IDLE] Move users who are idle for too long',
+            title: 'Idle - Move users who are idle for too long',
             type: 'checkbox'
         },
         {
@@ -236,28 +331,50 @@ registerPlugin({
             indent: 3,
             conditions: [{ field: 'idleEnabled', value: true }]
         },
-
-        /*** general - notify ***/
+        /*** Idle notifications ***/
+        /*** Enable notifications for Idle section ***/
         {
-            name: 'notifyEnabled',
-            title: 'Notify users when they get moved',
-            type: 'checkbox'
+            name: 'idlenotify',
+            title: 'Enable idle notifications',
+            type: 'checkbox',
+            indent: 3,
+            conditions: [{ field: 'idleEnabled', value: true }]
         },
+        /*** How should a client be notified ***/
         {
-            name: 'notifyType',
-            title: 'How should users be notified?',
+            name: 'idlenotifyType',
+            title: 'How should client be notified?',
             type: 'select',
             options: [ 'chat', 'poke' ],
-            indent: 3,
-            conditions: [{ field: 'notifyEnabled', value: true }]
+            indent: 4,
+            conditions: [{ field: 'idlenotify', value: true }]
         },
+        /*** Notification msgs ***/
         {
-            name: 'notifyText',
-            title: 'Notification message (%reason% = away/mute/deaf/idle)',
+            name: 'idlenotifyText',
+            title: 'Notification message',
             type: 'string',
-            placeholder: 'You were moved to the afk channel, reason: %reason%',
-            indent: 3,
-            conditions: [{ field: 'notifyEnabled', value: true }]
+            placeholder: 'You were moved to the afk channel because you were idle for 30 minutes',
+            indent: 4,
+            conditions: [{ field: 'idlenotify', value: true }]
+        },
+        /*** How should a client be notified ***/
+        {
+            name: 'preidlenotifyType',
+            title: 'How should client be notified?',
+            type: 'select',
+            options: [ 'chat', 'poke' ],
+            indent: 4,
+            conditions: [{ field: 'idlenotify', value: true }]
+        },
+        /*** Notification msgs ***/
+        {
+            name: 'preidlenotifyText',
+            title: 'Notification message',
+            type: 'string',
+            placeholder: 'You were moved to the afk channel because you were idle for 30 minutes',
+            indent: 4,
+            conditions: [{ field: 'idlenotify', value: true }]
         },
     ]
 }, function (sinusbot, config, info) {
@@ -270,14 +387,23 @@ registerPlugin({
     // set default config values
     config.awayMoveBack = config.awayMoveBack || false
     config.awayDelay = config.awayDelay || 0
+    config.awaynotifyType = config.awaynotifyType || 0
+    config.awaynotifyText = config.awaynotifyText && config.awaynotifyText != '' ? config.awaynotifyText : 'You were moved to the AFK channel because of your away status.'
     config.muteMoveBack = config.muteMoveBack || false
     config.muteDelay = config.muteDelay || 0
+    config.mutenotifyType = config.mutenotifyType || 0
+    config.mutenotifyText = config.mutenotifyText && config.mutenotifyText != '' ? config.mutenotifyText : 'You were moved to the AFK channel because you are muted.'
     config.deafMoveBack = config.deafMoveBack || false
     config.deafDelay = config.deafDelay || 0
+    config.deafnotifyType = config.deafnotifyType || 0
+    config.deafnotifyText = config.deafnotifyText && config.deafnotifyText != '' ? config.deafnotifyText : 'You were moved to the AFK channel because you are deafend.'
     config.idleThreshold = config.idleThreshold || 0
+    config.idlenotifyType = config.idlenotifyType || 0
+    config.idlenotifyText = config.idlenotifyText && config.idlenotifyText != '' ? config.idlenotifyText : 'You were moved to the AFK channel because you are for 30 minutes.'
+    config.preidlenotifyType = config.preidlenotifyType || 0
+    config.preidlenotifyText = config.preidlenotifyText && config.preidlenotifyText != '' ? config.preidlenotifyText : 'You will be moved in 1 minute because you are idle.'
+
     config.notifyEnabled = config.notifyEnabled || false
-    config.notifyType = config.notifyType || 0
-    config.notifyText = config.notifyText && config.notifyText != '' ? config.notifyText : 'You were moved to the afk channel, reason: %reason%'
     engine.saveConfig(config)
 
     var log = new Logger()

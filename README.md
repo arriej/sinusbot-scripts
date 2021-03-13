@@ -1,9 +1,11 @@
 # sinusbot scripts
 
-**THIS IS NO LONGER MAINTAINED** and might be archived soon.
-Feel free to fork and work on these scripts on your own (as long as you follow the [MIT license](https://github.com/irgendwr/sinusbot-scripts/blob/master/LICENSE) and mention me).
+This is a fork of the original work of Jonas Bögle (irgendwr).
+I'm not planning to maintain these scripts. But more or less add some features i'd personally like on existing scripts.
+Im a noob when it comes to javascript but lets give it a try.  
 
-This repository contains a few scripts that I wrote for the [SinusBot](https://sinusbot.com).
+
+This repository includes a few scripts that Jonas Bögle (irgendwr) wrote for the [SinusBot](https://sinusbot.com).
 
 ## Installation
 
